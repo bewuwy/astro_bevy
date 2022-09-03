@@ -73,7 +73,7 @@ fn player_system(
 }
 
 #[derive(Component)]
-struct Player {
+pub struct Player {
     speed: f32,
     direction: bool, // true = right, false = left
 }

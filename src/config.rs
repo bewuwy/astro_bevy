@@ -11,18 +11,31 @@ pub static BACKGROUND_COLOR: [f32; 3] = [124.0, 132.0, 131.0];
 pub struct CollGroupsConfig;
 
 impl CollGroupsConfig {
+    // pain...
+
     pub fn player() -> CollisionGroups {
-        // Group 0, interacts with group 2
-        CollisionGroups::new(0b001, 0b100)
+        // Group 0, interacts with groups 2, 3 and 4
+        CollisionGroups::new(0b00001, 0b11100)
     }
 
-    pub fn bullet() -> CollisionGroups {
-        // Group 1, interacts with group 2
-        CollisionGroups::new(0b010, 0b100)
+    pub fn bullet_player() -> CollisionGroups {
+        // Group 1, interacts with group 3 and 4
+        CollisionGroups::new(0b00010, 0b11000)
+    }
+
+    // TODO: make bullet_enemy interact with bullet_player
+    pub fn bullet_enemy() -> CollisionGroups {
+        // Group 2, interacts with group 0 and 4
+        CollisionGroups::new(0b00100, 0b10001)
+    }
+
+    pub fn enemy() -> CollisionGroups {
+        // Group 3, interacts with group 0, 1 and 4
+        CollisionGroups::new(0b01000, 0b10011)
     }
 
     pub fn wall() -> CollisionGroups {
-        // Group 2, interacts with group 0 and 1
-        CollisionGroups::new(0b100, 0b011)
+        // Group 4, interacts with group 0, 1, 2, 3
+        CollisionGroups::new(0b10000, 0b01111)
     }
 }

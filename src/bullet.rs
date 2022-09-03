@@ -2,10 +2,16 @@ use bevy::{math::vec2, prelude::*};
 use bevy_rapier2d::prelude::*;
 
 use crate::config::*;
+use crate::enemy::Enemy;
+use crate::player::Player;
 
 fn bullet_system(
     mut commands: Commands,
+
     mut bullet_query: Query<(Entity, &Transform, &Bullet)>,
+    enemy_query: Query<(Entity, &Enemy)>,
+    mut player_query: Query<(&mut Transform, &mut Velocity, &Player), Without<Bullet>>,
+
     mut bullets_collision: EventReader<CollisionEvent>,
 ) {
     // despawn bullet if off screen
@@ -27,12 +33,49 @@ fn bullet_system(
     // despawn bullet if it hit anything
     for collision in bullets_collision.iter() {
         if let CollisionEvent::Started(e1, e2, _) = collision {
+            let mut bullet_entity = *e1;
+            let mut other_entity = *e2;
+
             if let Ok((entity, _, _)) = bullet_query.get(*e1) {
-                commands.entity(entity).despawn();
+                bullet_entity = entity;
+                other_entity = *e2;
             }
             if let Ok((entity, _, _)) = bullet_query.get(*e2) {
-                commands.entity(entity).despawn();
+                bullet_entity = entity;
+                other_entity = *e1;
             }
+
+            // check if player bullet hit enemy
+            if let Ok((_, _, bullet)) = bullet_query.get(bullet_entity) {
+                if let BulletType::Player = bullet.type_ {
+                    if let Ok((_, _)) = enemy_query.get(other_entity) {
+                        // despawn enemy
+                        commands.entity(other_entity).despawn();
+                    }
+                }
+            }
+
+            // check if enemy bullet hit player
+            if let Ok((_, _, bullet)) = bullet_query.get(bullet_entity) {
+                if let BulletType::Enemy = bullet.type_ {
+                    if let Ok((mut player_transform, mut player_vel, _)) =
+                        player_query.get_mut(other_entity)
+                    {
+                        // teleport player
+                        player_transform.translation.x = 0.0;
+                        player_transform.translation.y = 200.0;
+
+                        // reset player velocity
+                        player_vel.linvel = vec2(0.0, 0.0);
+
+                        println!("You ded.");
+                        // commands.entity(other_entity).despawn();
+                    }
+                }
+            }
+
+            // despawn bullet
+            commands.entity(bullet_entity).despawn();
         }
     }
 }
@@ -41,6 +84,7 @@ fn bullet_system(
 pub struct Bullet {
     speed: f32,
     texture: Handle<Image>,
+    type_: BulletType,
 }
 
 impl Bullet {
@@ -48,10 +92,21 @@ impl Bullet {
         Self {
             speed: 1300.0,
             texture,
+            type_: BulletType::Player,
         }
     }
 
+    pub fn with_type(mut self, type_: BulletType) -> Self {
+        self.type_ = type_;
+        self
+    }
+
     pub fn spawn(&self, x: f32, y: f32, direction: bool, commands: &mut Commands) {
+        let coll_group = match self.type_ {
+            BulletType::Player => CollGroupsConfig::bullet_player(),
+            BulletType::Enemy => CollGroupsConfig::bullet_enemy(),
+        };
+
         commands
             .spawn()
             .insert(RigidBody::Dynamic)
@@ -71,9 +126,15 @@ impl Bullet {
             })
             .insert(ActiveEvents::COLLISION_EVENTS)
             .insert(Ccd::enabled())
-            .insert(CollGroupsConfig::bullet())
+            .insert(coll_group)
             .insert(self.clone());
     }
+}
+
+#[derive(Clone, Copy)]
+pub enum BulletType {
+    Player,
+    Enemy,
 }
 
 pub struct BulletPlugin;
