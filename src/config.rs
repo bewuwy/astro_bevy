@@ -3,9 +3,15 @@ use bevy_rapier2d::prelude::*;
 // game config
 pub static GAME_NAME: &str = "Astro bevy";
 pub static WINDOW_WIDTH: f32 = 1280.0;
-pub static WINDOW_HEIGHT: f32 = 720.0;
+pub static WINDOW_HEIGHT: f32 = 960.0;
 
 pub static BACKGROUND_COLOR: [f32; 3] = [124.0, 132.0, 131.0];
+
+// z-index config
+pub static Z_INDEX_PLAYER: f32 = 10.0;
+pub static Z_INDEX_BULLET: f32 = 5.0;
+pub static Z_INDEX_ENEMY: f32 = 6.0;
+pub static Z_INDEX_WALL: f32 = 1.0;
 
 // rapier config
 pub struct CollGroupsConfig;

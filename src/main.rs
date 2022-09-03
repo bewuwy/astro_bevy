@@ -25,7 +25,9 @@ fn main() {
             // present_mode: PresentMode::AutoVsync,
             ..default()
         })
-        // .insert_resource(ClearColor(Color::NONE))
+        // pixel art camera setup
+        .insert_resource(bevy::render::texture::ImageSettings::default_nearest())
+        // background colour
         .insert_resource(ClearColor(Color::rgb(
             BACKGROUND_COLOR[0] / 255.0,
             BACKGROUND_COLOR[1] / 255.0,
@@ -48,12 +50,12 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     // Add a 2D Camera
     commands.spawn_bundle(Camera2dBundle {
         projection: OrthographicProjection {
-            // far: 1000.0,
             scaling_mode: ScalingMode::FixedVertical(WINDOW_HEIGHT),
             ..Default::default()
         },
         ..Default::default()
     });
+    // commands.spawn_bundle(PixelCameraBundle::from_height(WINDOW_HEIGHT as i32));
 
     // Spawn walls
     Wall::new(10, asset_server.load("wall.png")).spawn(-200.0, 0.0, &mut commands);

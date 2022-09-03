@@ -121,7 +121,7 @@ impl Bullet {
             .insert(GravityScale(0.0))
             .insert_bundle(SpriteBundle {
                 texture: self.texture.clone(),
-                transform: Transform::from_xyz(x, y, 5.0),
+                transform: Transform::from_xyz(x, y, Z_INDEX_BULLET),
                 ..Default::default()
             })
             .insert(ActiveEvents::COLLISION_EVENTS)

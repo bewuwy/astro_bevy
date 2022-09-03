@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use bevy_rapier2d::prelude::*;
 
 use crate::bullet::{Bullet, BulletType};
-use crate::config::CollGroupsConfig;
+use crate::config::*;
 
 #[derive(Component, Clone)]
 pub struct Enemy {
@@ -32,7 +32,7 @@ impl Enemy {
             .insert(LockedAxes::ROTATION_LOCKED)
             .insert_bundle(SpriteBundle {
                 texture,
-                transform: Transform::from_xyz(x, y, 5.0),
+                transform: Transform::from_xyz(x, y, Z_INDEX_ENEMY),
                 ..Default::default()
             })
             .insert(CollGroupsConfig::enemy())
@@ -57,7 +57,7 @@ fn enemy_system(
                 .with_type(BulletType::Enemy)
                 .spawn(
                     transform.translation.x,
-                    transform.translation.y,
+                    transform.translation.y - 4.0,
                     enemy.direction,
                     &mut commands,
                 );

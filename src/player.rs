@@ -21,7 +21,7 @@ fn player_setup(mut commands: Commands, asset_server: Res<AssetServer>) {
         .insert(Player::new())
         .insert_bundle(SpriteBundle {
             texture: asset_server.load("player.png"),
-            transform: Transform::from_xyz(0.0, 300.0, 5.0),
+            transform: Transform::from_xyz(0.0, 300.0, Z_INDEX_PLAYER),
             ..Default::default()
         })
         .insert(CollGroupsConfig::player());
@@ -65,7 +65,7 @@ fn player_system(
     if keyboard_input.just_pressed(KeyCode::Space) {
         Bullet::new(asset_server.load("bullet.png")).spawn(
             player_transform.translation.x,
-            player_transform.translation.y,
+            player_transform.translation.y - 14.0,
             player.direction,
             &mut commands,
         );
