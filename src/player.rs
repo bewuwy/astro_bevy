@@ -82,7 +82,7 @@ impl Player {
     fn new() -> Self {
         Self {
             speed: 500.0,
-            direction: false,
+            direction: true,
         }
     }
 }

@@ -3,7 +3,11 @@ use bevy_rapier2d::prelude::*;
 
 use crate::config::*;
 
-fn bullet_system(mut commands: Commands, mut bullet_query: Query<(Entity, &Transform, &Bullet)>) {
+fn bullet_system(
+    mut commands: Commands,
+    mut bullet_query: Query<(Entity, &Transform, &Bullet)>,
+    mut bullets_collision: EventReader<CollisionEvent>,
+) {
     // despawn bullet if off screen
     for (entity, transform, _) in bullet_query.iter_mut() {
         if transform.translation.x < -WINDOW_WIDTH {
@@ -17,6 +21,18 @@ fn bullet_system(mut commands: Commands, mut bullet_query: Query<(Entity, &Trans
         }
         if transform.translation.y > WINDOW_HEIGHT {
             commands.entity(entity).despawn();
+        }
+    }
+
+    // despawn bullet if it hit anything
+    for collision in bullets_collision.iter() {
+        if let CollisionEvent::Started(e1, e2, _) = collision {
+            if let Ok((entity, _, _)) = bullet_query.get(*e1) {
+                commands.entity(entity).despawn();
+            }
+            if let Ok((entity, _, _)) = bullet_query.get(*e2) {
+                commands.entity(entity).despawn();
+            }
         }
     }
 }
@@ -53,6 +69,7 @@ impl Bullet {
                 transform: Transform::from_xyz(x, y, 5.0),
                 ..Default::default()
             })
+            .insert(ActiveEvents::COLLISION_EVENTS)
             .insert(Ccd::enabled())
             .insert(CollGroupsConfig::bullet())
             .insert(self.clone());

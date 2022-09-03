@@ -30,6 +30,7 @@ fn main() {
         )))
         // rapier
         .add_plugin(RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(100.0))
+        // debug
         .add_plugin(RapierDebugRenderPlugin::default())
         // systems
         .add_startup_system(setup)
@@ -39,12 +40,7 @@ fn main() {
         .run();
 }
 
-fn setup(
-    mut commands: Commands,
-    asset_server: Res<AssetServer>,
-    // mut meshes: ResMut<Assets<Mesh>>,
-    // mut materials: ResMut<Assets<ColorMaterial>>,
-) {
+fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     // Add a 2D Camera
     commands.spawn_bundle(Camera2dBundle {
         projection: OrthographicProjection {

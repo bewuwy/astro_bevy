@@ -7,4 +7,7 @@ edition = "2021"
 
 [dependencies]
 bevy="0.8.1"
-bevy_rapier2d = {version = "0.16.2", features = ["debug-render"]}
+
+[dependencies.bevy_rapier2d]
+version = "0.16.2"
+# features = ["debug-render"]
