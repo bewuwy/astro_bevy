@@ -1,14 +1,14 @@
 use bevy::{prelude::*, render::camera::ScalingMode};
 use bevy_rapier2d::prelude::*;
 
+mod bullet;
 mod config;
 mod player;
-mod bullet;
 mod wall;
 
+use bullet::BulletPlugin;
 use config::*;
 use player::PlayerPlugin;
-use bullet::BulletPlugin;
 use wall::*;
 
 fn main() {

@@ -1,8 +1,7 @@
-use bevy::{prelude::*, math::vec2};
+use bevy::{math::vec2, prelude::*};
 use bevy_rapier2d::prelude::*;
 
 use crate::config::*;
-
 
 fn bullet_system(mut commands: Commands, mut bullet_query: Query<(Entity, &Transform, &Bullet)>) {
     // despawn bullet if off screen
@@ -36,12 +35,18 @@ impl Bullet {
         }
     }
 
-    pub fn spawn(&self, x: f32, y: f32, commands: &mut Commands) {
+    pub fn spawn(&self, x: f32, y: f32, direction: bool, commands: &mut Commands) {
         commands
             .spawn()
             .insert(RigidBody::Dynamic)
             .insert(Collider::ball(5.0))
-            .insert(Velocity::linear(vec2(-self.speed, 0.0)))
+            .insert(Velocity::linear(vec2(
+                match direction {
+                    true => 1.0,
+                    false => -1.0,
+                } * self.speed,
+                0.0,
+            )))
             .insert(GravityScale(0.0))
             .insert_bundle(SpriteBundle {
                 texture: self.texture.clone(),

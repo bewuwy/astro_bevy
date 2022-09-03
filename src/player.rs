@@ -1,8 +1,8 @@
 use bevy::prelude::*;
 use bevy_rapier2d::prelude::*;
 
-use crate::config::*;
 use crate::bullet::*;
+use crate::config::*;
 
 fn player_setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     /* Create the player */
@@ -28,13 +28,14 @@ fn player_setup(mut commands: Commands, asset_server: Res<AssetServer>) {
 }
 
 fn player_system(
-    mut player_query: Query<(&mut Player, &mut Velocity, &Transform)>,
+    mut player_query: Query<(&mut Player, &mut Velocity, &mut Sprite, &Transform)>,
 
     keyboard_input: Res<Input<KeyCode>>,
     asset_server: Res<AssetServer>,
     mut commands: Commands,
 ) {
-    let (player, mut player_vel, player_transform) = player_query.single_mut();
+    let (mut player, mut player_vel, mut player_sprite, player_transform) =
+        player_query.single_mut();
 
     // movement
     let up = keyboard_input.pressed(KeyCode::W) || keyboard_input.pressed(KeyCode::Up);
@@ -44,6 +45,12 @@ fn player_system(
 
     let x_axis = -(left as i8) + right as i8;
     let y_axis = -(down as i8) + up as i8;
+
+    if x_axis != 0 {
+        player.direction = right;
+
+        player_sprite.flip_x = !player.direction;
+    }
 
     let mut move_delta = Vec2::new(x_axis as f32, y_axis as f32);
     if move_delta != Vec2::ZERO {
@@ -59,6 +66,7 @@ fn player_system(
         Bullet::new(asset_server.load("bullet.png")).spawn(
             player_transform.translation.x,
             player_transform.translation.y,
+            player.direction,
             &mut commands,
         );
     }
@@ -67,11 +75,15 @@ fn player_system(
 #[derive(Component)]
 struct Player {
     speed: f32,
+    direction: bool, // true = right, false = left
 }
 
 impl Player {
     fn new() -> Self {
-        Self { speed: 500.0 }
+        Self {
+            speed: 500.0,
+            direction: false,
+        }
     }
 }
 
