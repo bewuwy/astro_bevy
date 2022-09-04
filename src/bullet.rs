@@ -126,15 +126,14 @@ impl Bullet {
         commands
             .spawn()
             .insert(RigidBody::Dynamic)
-            .insert(Collider::ball(5.0))
+            .insert(Collider::cuboid(7.5, 2.0))
             .insert(Velocity::linear(bullet_vel))
             .insert(GravityScale(0.0))
             .insert_bundle(SpriteBundle {
                 texture: self.texture.clone(),
-                transform: Transform::from_xyz(x, y, Z_INDEX_BULLET).with_rotation(
-                    Quat::from_rotation_z(bullet_rotation),
-                ),
-                
+                transform: Transform::from_xyz(x, y, Z_INDEX_BULLET)
+                    .with_rotation(Quat::from_rotation_z(bullet_rotation)),
+
                 ..Default::default()
             })
             .insert(ActiveEvents::COLLISION_EVENTS)

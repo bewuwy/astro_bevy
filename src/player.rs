@@ -4,7 +4,11 @@ use bevy_rapier2d::prelude::*;
 use crate::bullet::*;
 use crate::config::*;
 
-fn player_setup(mut commands: Commands, asset_server: Res<AssetServer>) {
+fn player_setup(
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+    mut textures: ResMut<Assets<TextureAtlas>>,
+) {
     /* Create the player */
     commands
         .spawn()
@@ -19,8 +23,13 @@ fn player_setup(mut commands: Commands, asset_server: Res<AssetServer>) {
         .insert(GravityScale(0.0))
         .insert(LockedAxes::ROTATION_LOCKED)
         .insert(Player::new())
-        .insert_bundle(SpriteBundle {
-            texture: asset_server.load("player/side.png"),
+        .insert_bundle(SpriteSheetBundle {
+            texture_atlas: textures.add(TextureAtlas::from_grid(
+                asset_server.load("player/sheet.png"),
+                Vec2 { x: 64.0, y: 64.0 },
+                3,
+                1,
+            )),
             transform: Transform::from_xyz(0.0, 300.0, Z_INDEX_PLAYER),
             ..Default::default()
         })
@@ -28,7 +37,12 @@ fn player_setup(mut commands: Commands, asset_server: Res<AssetServer>) {
 }
 
 fn player_system(
-    mut player_query: Query<(&mut Player, &mut Velocity, &mut Sprite, &Transform)>,
+    mut player_query: Query<(
+        &mut Player,
+        &mut Velocity,
+        &mut TextureAtlasSprite,
+        &Transform,
+    )>,
 
     keyboard_input: Res<Input<KeyCode>>,
     asset_server: Res<AssetServer>,
@@ -52,7 +66,9 @@ fn player_system(
             false => SpriteDirection::Left,
         };
 
+        // todo: change from flipping sprite to changing texture
         player_sprite.flip_x = player.direction != SpriteDirection::Right;
+        player_sprite.index = 0;
     }
     if y_axis != 0 {
         player.direction = match up {
@@ -60,6 +76,13 @@ fn player_system(
             false => SpriteDirection::Down,
         };
 
+        player_sprite.flip_x = false;
+
+        match player.direction {
+            SpriteDirection::Up => player_sprite.index = 1,
+            SpriteDirection::Down => player_sprite.index = 2,
+            _ => {}
+        }
     }
 
     let mut move_delta = Vec2::new(x_axis as f32, y_axis as f32);
@@ -73,8 +96,15 @@ fn player_system(
 
     // shooting
     if keyboard_input.just_pressed(KeyCode::Space) {
+        let bullet_x = match player.direction {
+            SpriteDirection::Left => player_transform.translation.x - 16.0,
+            SpriteDirection::Right => player_transform.translation.x + 16.0,
+            SpriteDirection::Down => player_transform.translation.x - 14.0,
+            SpriteDirection::Up => player_transform.translation.x + 14.0,
+        };
+
         Bullet::new(asset_server.load("bullet.png")).spawn(
-            player_transform.translation.x,
+            bullet_x,
             player_transform.translation.y - 14.0,
             player.direction,
             &mut commands,

@@ -58,8 +58,8 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     // commands.spawn_bundle(PixelCameraBundle::from_height(WINDOW_HEIGHT as i32));
 
     // Spawn walls
-    Wall::new(10, asset_server.load("wall.png")).spawn(-200.0, 0.0, &mut commands);
-    Wall::new(8, asset_server.load("wall.png")).spawn(200.0, -20.0, &mut commands);
+    Wall::new(10, asset_server.load("wall.png")).spawn(-350.0, 0.0, &mut commands);
+    Wall::new(8, asset_server.load("wall.png")).spawn(300.0, -20.0, &mut commands);
 
     // Spawn enemy
     Enemy::new().spawn(
@@ -68,4 +68,8 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
         asset_server.load("enemy.png"),
         &mut commands,
     );
+
+    Enemy::new().spawn(-250.0, 0.0, asset_server.load("enemy.png"), &mut commands);
+
+    Enemy::new().spawn(150.0, -200.0, asset_server.load("enemy.png"), &mut commands);
 }
