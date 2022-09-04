@@ -27,7 +27,7 @@ fn player_setup(
             texture_atlas: textures.add(TextureAtlas::from_grid(
                 asset_server.load("player/sheet.png"),
                 Vec2 { x: 64.0, y: 64.0 },
-                3,
+                4,
                 1,
             )),
             transform: Transform::from_xyz(0.0, 300.0, Z_INDEX_PLAYER),
@@ -65,24 +65,20 @@ fn player_system(
             true => SpriteDirection::Right,
             false => SpriteDirection::Left,
         };
-
-        // todo: change from flipping sprite to changing texture
-        player_sprite.flip_x = player.direction != SpriteDirection::Right;
-        player_sprite.index = 0;
     }
     if y_axis != 0 {
         player.direction = match up {
             true => SpriteDirection::Up,
             false => SpriteDirection::Down,
         };
+    }
 
-        player_sprite.flip_x = false;
-
-        match player.direction {
-            SpriteDirection::Up => player_sprite.index = 1,
-            SpriteDirection::Down => player_sprite.index = 2,
-            _ => {}
-        }
+    // update sprite
+    match player.direction {
+        SpriteDirection::Right => player_sprite.index = 0,
+        SpriteDirection::Left => player_sprite.index = 1,
+        SpriteDirection::Up => player_sprite.index = 2,
+        SpriteDirection::Down => player_sprite.index = 3,
     }
 
     let mut move_delta = Vec2::new(x_axis as f32, y_axis as f32);
