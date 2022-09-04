@@ -45,3 +45,13 @@ impl CollGroupsConfig {
         CollisionGroups::new(0b10000, 0b01111)
     }
 }
+
+// utility
+
+#[derive(PartialEq, Clone, Copy)]
+pub enum SpriteDirection {
+    Left,
+    Right,
+    Up,
+    Down,
+}

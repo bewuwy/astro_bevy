@@ -6,14 +6,14 @@ use crate::config::*;
 
 #[derive(Component, Clone)]
 pub struct Enemy {
-    direction: bool,
+    direction: SpriteDirection,
     last_shot: Timer,
 }
 
 impl Enemy {
     pub fn new() -> Self {
         Enemy {
-            direction: true,
+            direction: SpriteDirection::Right,
             last_shot: Timer::from_seconds(2.0, true),
         }
     }

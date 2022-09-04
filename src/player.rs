@@ -20,7 +20,7 @@ fn player_setup(mut commands: Commands, asset_server: Res<AssetServer>) {
         .insert(LockedAxes::ROTATION_LOCKED)
         .insert(Player::new())
         .insert_bundle(SpriteBundle {
-            texture: asset_server.load("player.png"),
+            texture: asset_server.load("player/side.png"),
             transform: Transform::from_xyz(0.0, 300.0, Z_INDEX_PLAYER),
             ..Default::default()
         })
@@ -47,9 +47,19 @@ fn player_system(
     let y_axis = -(down as i8) + up as i8;
 
     if x_axis != 0 {
-        player.direction = right;
+        player.direction = match right {
+            true => SpriteDirection::Right,
+            false => SpriteDirection::Left,
+        };
 
-        player_sprite.flip_x = !player.direction;
+        player_sprite.flip_x = player.direction != SpriteDirection::Right;
+    }
+    if y_axis != 0 {
+        player.direction = match up {
+            true => SpriteDirection::Up,
+            false => SpriteDirection::Down,
+        };
+
     }
 
     let mut move_delta = Vec2::new(x_axis as f32, y_axis as f32);
@@ -75,14 +85,14 @@ fn player_system(
 #[derive(Component)]
 pub struct Player {
     speed: f32,
-    direction: bool, // true = right, false = left
+    direction: SpriteDirection,
 }
 
 impl Player {
     fn new() -> Self {
         Self {
             speed: 500.0,
-            direction: true,
+            direction: SpriteDirection::Right,
         }
     }
 }
