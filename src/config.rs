@@ -3,16 +3,16 @@ use bevy_rapier2d::prelude::*;
 // game config
 pub static GAME_NAME: &str = "Astro bevy";
 pub static WINDOW_WIDTH: f32 = 512.0;
-pub static WINDOW_HEIGHT: f32 = 512.0; // 960.0;
-pub static TILE_SIZE: f32 = 32.0;
+pub static WINDOW_HEIGHT: f32 = 512.0;
+// pub static TILE_SIZE: f32 = 32.0;
 
 pub static BACKGROUND_COLOR: [f32; 3] = [124.0, 132.0, 131.0];
 
 // z-index config
 pub static Z_INDEX_PLAYER: f32 = 10.0;
 pub static Z_INDEX_BULLET: f32 = 5.0;
-pub static Z_INDEX_ENEMY: f32 = 6.0;
-pub static Z_INDEX_WALL: f32 = 1.0;
+// pub static Z_INDEX_ENEMY: f32 = 6.0; // TODO: add z-axis to enemies and walls
+// pub static Z_INDEX_WALL: f32 = 1.0;
 
 // rapier config
 pub struct CollGroupsConfig;
@@ -41,10 +41,10 @@ impl CollGroupsConfig {
         CollisionGroups::new(0b01000, 0b10011)
     }
 
-    pub fn wall() -> CollisionGroups {
-        // Group 4, interacts with group 0, 1, 2, 3
-        CollisionGroups::new(0b10000, 0b01111)
-    }
+    // pub fn wall() -> CollisionGroups {
+    //     // Group 4, interacts with group 0, 1, 2, 3
+    //     CollisionGroups::new(0b10000, 0b01111)
+    // }
 }
 
 // utility

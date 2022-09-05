@@ -1,6 +1,6 @@
 use bevy::{prelude::*, render::camera::ScalingMode};
-use bevy_rapier2d::prelude::*;
 use bevy_ecs_ldtk::prelude::*;
+use bevy_rapier2d::prelude::*;
 
 mod bullet;
 mod config;
@@ -18,7 +18,7 @@ fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
         // ldtk
-        .add_plugin(LdtkPlugin) 
+        .add_plugin(LdtkPlugin)
         .insert_resource(LevelSelection::Index(0))
         .insert_resource(LdtkSettings {
             level_spawn_behavior: LevelSpawnBehavior::UseWorldTranslation {
@@ -28,6 +28,7 @@ fn main() {
             ..Default::default()
         })
         .register_ldtk_int_cell::<WallBundle>(1)
+        .register_ldtk_entity::<EnemyBundle>("Snake_Enemy")
         .add_system(spawn_wall_colliders)
         // window setup
         .insert_resource(WindowDescriptor {
@@ -66,23 +67,13 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
             scaling_mode: ScalingMode::FixedVertical(WINDOW_HEIGHT),
             ..Default::default()
         },
+        transform: Transform::from_xyz(WINDOW_WIDTH / 2.0, WINDOW_HEIGHT / 2.0, 1000.0),
         ..Default::default()
     });
-    // commands.spawn_bundle(PixelCameraBundle::from_height(WINDOW_HEIGHT as i32));
 
-    // Spawn walls
-    Wall::new(10, asset_server.load("wall.png")).spawn(-350.0, 0.0, &mut commands);
-    Wall::new(8, asset_server.load("wall.png")).spawn(300.0, -20.0, &mut commands);
-
-    // Spawn enemy
-    Enemy::new().spawn(
-        -100.0,
-        -100.0,
-        asset_server.load("enemy.png"),
-        &mut commands,
-    );
-
-    Enemy::new().spawn(-250.0, 0.0, asset_server.load("enemy.png"), &mut commands);
-
-    Enemy::new().spawn(150.0, -200.0, asset_server.load("enemy.png"), &mut commands);
+    // Spawn from LDtk
+    commands.spawn_bundle(LdtkWorldBundle {
+        ldtk_handle: asset_server.load("ldtk.ldtk"),
+        ..Default::default()
+    });
 }

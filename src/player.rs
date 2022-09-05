@@ -4,7 +4,7 @@ use bevy_rapier2d::prelude::*;
 use crate::bullet::*;
 use crate::config::*;
 
-static START_X: f32 = WINDOW_WIDTH/2.0;
+static START_X: f32 = WINDOW_WIDTH / 2.0;
 static START_Y: f32 = 200.0;
 
 fn player_setup(
