@@ -88,25 +88,53 @@ pub struct EnemyBundle {
 
 impl LdtkEntity for EnemyBundle {
     fn bundle_entity(
-        _: &EntityInstance,
+        entity: &EntityInstance,
         _: &LayerInstance,
         _: Option<&Handle<Image>>,
         _: Option<&TilesetDefinition>,
         asset_server: &AssetServer,
         _: &mut Assets<TextureAtlas>,
     ) -> EnemyBundle {
+        let mut enemy = Enemy::new();
+        let mut x_flip = false;
+
+        if let Some(rotation_field) = entity
+            .field_instances
+            .iter()
+            .find(|f| f.identifier == *"Rotation")
+        {
+            if let FieldValue::Enum(Some(rot)) = &rotation_field.value {
+                // sprite.color = color;
+                println!("Rotation: {:?}", rot);
+
+                match rot.as_str() {
+                    "Left" => {
+                        enemy.direction = SpriteDirection::Left;
+                        x_flip = true
+                    }
+                    "Right" => enemy.direction = SpriteDirection::Right,
+                    _ => {}
+                }
+            }
+        }
+
+        // enemy collider
         let collider = Collider::compound(vec![(
-            Vec2::new(0.0, -2.5),
+            Vec2::new(-2.0, -2.5),
             0.0,
-            Collider::cuboid(8.0, 13.0),
+            Collider::cuboid(11.0, 13.0),
         )]);
 
         EnemyBundle {
             sprite_bundle: SpriteBundle {
                 texture: asset_server.load("enemy.png"),
+                sprite: Sprite {
+                    flip_x: x_flip,
+                    ..Default::default()
+                },
                 ..Default::default()
             },
-            enemy: Enemy::new(),
+            enemy,
             collider,
             rigid_body: RigidBody::Dynamic,
             coll_groups: CollGroupsConfig::enemy(),

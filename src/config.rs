@@ -49,7 +49,7 @@ impl CollGroupsConfig {
 
 // utility
 
-#[derive(Default, PartialEq, Clone, Copy)]
+#[derive(Default, PartialEq, Eq, Clone, Copy)]
 pub enum SpriteDirection {
     #[default]
     Left,
