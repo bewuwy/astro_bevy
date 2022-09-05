@@ -2,8 +2,9 @@ use bevy_rapier2d::prelude::*;
 
 // game config
 pub static GAME_NAME: &str = "Astro bevy";
-pub static WINDOW_WIDTH: f32 = 1280.0;
-pub static WINDOW_HEIGHT: f32 = 960.0;
+pub static WINDOW_WIDTH: f32 = 512.0;
+pub static WINDOW_HEIGHT: f32 = 512.0; // 960.0;
+pub static TILE_SIZE: f32 = 32.0;
 
 pub static BACKGROUND_COLOR: [f32; 3] = [124.0, 132.0, 131.0];
 
@@ -48,8 +49,9 @@ impl CollGroupsConfig {
 
 // utility
 
-#[derive(PartialEq, Clone, Copy)]
+#[derive(Default, PartialEq, Clone, Copy)]
 pub enum SpriteDirection {
+    #[default]
     Left,
     Right,
     Up,

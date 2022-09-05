@@ -1,5 +1,6 @@
 use bevy::{prelude::*, render::camera::ScalingMode};
 use bevy_rapier2d::prelude::*;
+use bevy_ecs_ldtk::prelude::*;
 
 mod bullet;
 mod config;
@@ -9,13 +10,25 @@ mod wall;
 
 use bullet::BulletPlugin;
 use config::*;
-use enemy::{Enemy, EnemyPlugin};
+use enemy::*;
 use player::PlayerPlugin;
 use wall::*;
 
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
+        // ldtk
+        .add_plugin(LdtkPlugin) 
+        .insert_resource(LevelSelection::Index(0))
+        .insert_resource(LdtkSettings {
+            level_spawn_behavior: LevelSpawnBehavior::UseWorldTranslation {
+                load_level_neighbors: false,
+            },
+            set_clear_color: SetClearColor::FromLevelBackground,
+            ..Default::default()
+        })
+        .register_ldtk_int_cell::<WallBundle>(1)
+        .add_system(spawn_wall_colliders)
         // window setup
         .insert_resource(WindowDescriptor {
             title: GAME_NAME.to_string(),
@@ -33,7 +46,7 @@ fn main() {
             BACKGROUND_COLOR[1] / 255.0,
             BACKGROUND_COLOR[2] / 255.0,
         )))
-        // // rapier
+        // rapier
         .add_plugin(RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(100.0))
         // debug
         .add_plugin(RapierDebugRenderPlugin::default())

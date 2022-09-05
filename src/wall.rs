@@ -1,18 +1,19 @@
 use bevy::prelude::*;
 use bevy_rapier2d::prelude::*;
+use bevy_ecs_ldtk::prelude::*;
 
 use crate::config::*;
 
-static WALL_SPRITE_SIZE: f32 = 64.0;
+static WALL_SPRITE_SIZE: f32 = 32.0;
 
-pub struct Wall {
+pub struct WallEntity {
     height: u32,
     texture: Handle<Image>,
 }
 
-impl Wall {
+impl WallEntity {
     pub fn new(height: u32, texture: Handle<Image>) -> Self {
-        Wall { height, texture }
+        WallEntity { height, texture }
     }
 
     pub fn spawn(&self, x: f32, y: f32, commands: &mut Commands) {
@@ -42,4 +43,36 @@ impl Wall {
                 }
             });
     }
+}
+
+pub fn spawn_wall_colliders(
+    mut commands: Commands,
+    wall_query: Query<(&GridCoords, &Parent), Added<Wall>>,
+) {
+
+    for (coords, parent) in wall_query.iter() {
+
+        let x = (coords.x as f32 + 0.5) * WALL_SPRITE_SIZE;
+        let y = (coords.y as f32 + 0.5) * WALL_SPRITE_SIZE;
+
+        commands
+            .spawn()
+            .insert_bundle(TransformBundle {
+                local: Transform::from_xyz(x, y, 0.0),
+                ..Default::default()
+            })
+            .insert(RigidBody::Fixed)
+            .insert(Collider::cuboid(
+                WALL_SPRITE_SIZE / 2.0,
+                WALL_SPRITE_SIZE / 2.0,
+            ));
+    }
+}
+
+#[derive(Copy, Clone, Eq, PartialEq, Debug, Default, Component)]
+pub struct Wall;
+
+#[derive(Clone, Debug, Default, Bundle, LdtkIntCell)]
+pub struct WallBundle {
+    wall: Wall,
 }

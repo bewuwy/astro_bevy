@@ -18,10 +18,10 @@ fn bullet_system(
 ) {
     // despawn bullet if off screen
     for (entity, transform, _) in bullet_query.iter_mut() {
-        if transform.translation.x < -WINDOW_WIDTH {
+        if transform.translation.x < - (2.0 * WINDOW_WIDTH) {
             commands.entity(entity).despawn();
         }
-        if transform.translation.x > WINDOW_WIDTH {
+        if transform.translation.x > 2.0 * WINDOW_WIDTH {
             commands.entity(entity).despawn();
         }
         if transform.translation.y < -WINDOW_HEIGHT {
@@ -64,7 +64,7 @@ fn bullet_system(
                         player_query.get_mut(other_entity)
                     {
                         // teleport player
-                        player_transform.translation.x = 0.0;
+                        player_transform.translation.x = WINDOW_WIDTH/2.0;
                         player_transform.translation.y = 200.0;
 
                         // reset player velocity
