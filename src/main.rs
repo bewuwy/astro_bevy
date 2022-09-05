@@ -73,7 +73,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
 
     // Spawn from LDtk
     commands.spawn_bundle(LdtkWorldBundle {
-        ldtk_handle: asset_server.load("ldtk.ldtk"),
+        ldtk_handle: asset_server.load("world.ldtk"),
         ..Default::default()
     });
 }

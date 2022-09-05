@@ -2,8 +2,8 @@ use bevy_rapier2d::prelude::*;
 
 // game config
 pub static GAME_NAME: &str = "Astro bevy";
-pub static WINDOW_WIDTH: f32 = 512.0;
 pub static WINDOW_HEIGHT: f32 = 512.0;
+pub static WINDOW_WIDTH: f32 = 640.0;
 // pub static TILE_SIZE: f32 = 32.0;
 
 pub static BACKGROUND_COLOR: [f32; 3] = [124.0, 132.0, 131.0];

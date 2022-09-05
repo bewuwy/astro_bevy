@@ -102,7 +102,7 @@ fn player_system(
             SpriteDirection::Up => player_transform.translation.x + 7.0,
         };
 
-        Bullet::new(asset_server.load("bullet.png")).spawn(
+        Bullet::new(asset_server.load("bullet/player.png")).spawn(
             bullet_x,
             player_transform.translation.y - 7.0,
             player.direction,

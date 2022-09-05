@@ -56,7 +56,7 @@ fn enemy_system(
 
         if enemy.last_shot.finished() {
             // spawn bullet
-            Bullet::new(asset_server.load("bullet_enemy.png"))
+            Bullet::new(asset_server.load("bullet/enemy.png"))
                 .with_type(BulletType::Enemy)
                 .spawn(
                     transform.translation.x,
@@ -104,9 +104,6 @@ impl LdtkEntity for EnemyBundle {
             .find(|f| f.identifier == *"Rotation")
         {
             if let FieldValue::Enum(Some(rot)) = &rotation_field.value {
-                // sprite.color = color;
-                println!("Rotation: {:?}", rot);
-
                 match rot.as_str() {
                     "Left" => {
                         enemy.direction = SpriteDirection::Left;
@@ -127,7 +124,7 @@ impl LdtkEntity for EnemyBundle {
 
         EnemyBundle {
             sprite_bundle: SpriteBundle {
-                texture: asset_server.load("enemy.png"),
+                texture: asset_server.load("enemy/snake.png"),
                 sprite: Sprite {
                     flip_x: x_flip,
                     ..Default::default()
