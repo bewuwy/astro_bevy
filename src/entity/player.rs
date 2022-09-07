@@ -111,7 +111,7 @@ impl Player {
         Self {
             start_coords: Vec2::new(x, y),
             dead: false,
-            speed: 500.0,
+            speed: 400.0,
             direction: SpriteDirection::Left,
         }
     }

@@ -226,7 +226,7 @@
 			"tileRenderMode": "FitInside",
 			"tileRect": { "tilesetUid": 16, "x": 32, "y": 0, "w": 32, "h": 32 },
 			"nineSliceBorders": [],
-			"maxCount": 0,
+			"maxCount": 1,
 			"limitScope": "PerLevel",
 			"limitBehavior": "MoveLastOne",
 			"pivotX": 0,
@@ -622,7 +622,7 @@
 						},
 						{
 							"__identifier": "Player",
-							"__grid": [18,24],
+							"__grid": [15,24],
 							"__pivot": [0,0],
 							"__tags": [],
 							"__tile": { "tilesetUid": 16, "x": 32, "y": 0, "w": 32, "h": 32 },
@@ -631,7 +631,7 @@
 							"width": 32,
 							"height": 32,
 							"defUid": 15,
-							"px": [288,384],
+							"px": [240,384],
 							"fieldInstances": []
 						}
 					]
@@ -967,6 +967,20 @@
 								"id": "V_String",
 								"params": ["Up"]
 							}] }]
+						},
+						{
+							"__identifier": "Player",
+							"__grid": [30,16],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": { "tilesetUid": 16, "x": 32, "y": 0, "w": 32, "h": 32 },
+							"__smartColor": "#94D9B3",
+							"iid": "0a0d8f50-2a00-11ed-93a7-61fce5971705",
+							"width": 32,
+							"height": 32,
+							"defUid": 15,
+							"px": [480,256],
+							"fieldInstances": []
 						}
 					]
 				}

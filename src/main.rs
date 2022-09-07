@@ -3,6 +3,7 @@ use bevy_ecs_ldtk::prelude::*;
 use bevy_rapier2d::prelude::*;
 
 mod bullet;
+mod camera;
 mod config;
 mod entity;
 mod wall;
@@ -55,6 +56,7 @@ fn main() {
         .add_plugin(PlayerPlugin)
         .add_plugin(BulletPlugin)
         .add_plugin(EnemyPlugin)
+        .add_plugin(camera::CameraPlugin)
         .run();
 }
 
@@ -62,7 +64,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     // Add a 2D Camera
     commands.spawn_bundle(Camera2dBundle {
         projection: OrthographicProjection {
-            scaling_mode: ScalingMode::FixedVertical(WINDOW_HEIGHT),
+            scaling_mode: ScalingMode::FixedVertical(WINDOW_HEIGHT / CAMERA_SCALE),
             ..Default::default()
         },
         transform: Transform::from_xyz(WINDOW_WIDTH / 2.0, WINDOW_HEIGHT / 2.0, 1000.0),
