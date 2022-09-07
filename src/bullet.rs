@@ -4,15 +4,15 @@ use bevy::{math::vec2, prelude::*};
 use bevy_rapier2d::prelude::*;
 
 use crate::config::*;
-use crate::enemy::Enemy;
-use crate::player::Player;
+use crate::entity::enemy::Enemy;
+use crate::entity::player::Player;
 
 fn bullet_system(
     mut commands: Commands,
 
     mut bullet_query: Query<(Entity, &Transform, &Bullet)>,
     enemy_query: Query<(Entity, &Enemy)>,
-    mut player_query: Query<(&mut Transform, &mut Velocity, &Player), Without<Bullet>>,
+    mut player_query: Query<&mut Player>,
 
     mut bullets_collision: EventReader<CollisionEvent>,
 ) {
@@ -60,18 +60,8 @@ fn bullet_system(
             // check if enemy bullet hit player
             if let Ok((_, _, bullet)) = bullet_query.get(bullet_entity) {
                 if let BulletType::Enemy = bullet.type_ {
-                    if let Ok((mut player_transform, mut player_vel, _)) =
-                        player_query.get_mut(other_entity)
-                    {
-                        // teleport player
-                        player_transform.translation.x = WINDOW_WIDTH / 2.0;
-                        player_transform.translation.y = 200.0;
-
-                        // reset player velocity
-                        player_vel.linvel = vec2(0.0, 0.0);
-
-                        println!("You ded.");
-                        // commands.entity(other_entity).despawn();
+                    if let Ok(mut player) = player_query.get_mut(other_entity) {
+                        player.dead = true;
                     }
                 }
             }

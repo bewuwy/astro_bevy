@@ -4,14 +4,13 @@ use bevy_rapier2d::prelude::*;
 
 mod bullet;
 mod config;
-mod enemy;
-mod player;
+mod entity;
 mod wall;
 
 use bullet::BulletPlugin;
 use config::*;
-use enemy::*;
-use player::PlayerPlugin;
+use entity::enemy::*;
+use entity::player::*;
 use wall::*;
 
 fn main() {
@@ -21,14 +20,13 @@ fn main() {
         .add_plugin(LdtkPlugin)
         .insert_resource(LevelSelection::Index(0))
         .insert_resource(LdtkSettings {
-            level_spawn_behavior: LevelSpawnBehavior::UseWorldTranslation {
-                load_level_neighbors: false,
-            },
+            level_spawn_behavior: LevelSpawnBehavior::UseZeroTranslation,
             set_clear_color: SetClearColor::FromLevelBackground,
             ..Default::default()
         })
         .register_ldtk_int_cell::<WallBundle>(1)
         .register_ldtk_entity::<EnemyBundle>("Snake_Enemy")
+        .register_ldtk_entity::<PlayerBundle>("Player")
         .add_system(spawn_wall_colliders)
         // window setup
         .insert_resource(WindowDescriptor {

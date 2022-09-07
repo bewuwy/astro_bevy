@@ -7,6 +7,8 @@ use bevy_rapier2d::prelude::*;
 use crate::bullet::{Bullet, BulletType};
 use crate::config::*;
 
+use super::EntitySpriteBundle;
+
 #[derive(Default, Component, Clone)]
 pub struct Enemy {
     direction: SpriteDirection,
@@ -44,10 +46,9 @@ impl Enemy {
 }
 
 fn enemy_system(
-    mut commands: Commands,
-
     mut enemy_query: Query<(&mut Enemy, &Transform)>,
 
+    mut commands: Commands,
     asset_server: Res<AssetServer>,
     time: Res<Time>,
 ) {
@@ -77,13 +78,8 @@ fn enemy_system(
 #[derive(Clone, Default, Bundle)]
 pub struct EnemyBundle {
     #[bundle]
-    sprite_bundle: SpriteBundle,
+    entity_bundle: EntitySpriteBundle,
     enemy: Enemy,
-    collider: Collider,
-    rigid_body: RigidBody,
-    coll_groups: CollisionGroups,
-    gravity: GravityScale,
-    locked_axes: LockedAxes,
 }
 
 impl LdtkEntity for EnemyBundle {
@@ -123,20 +119,22 @@ impl LdtkEntity for EnemyBundle {
         )]);
 
         EnemyBundle {
-            sprite_bundle: SpriteBundle {
-                texture: asset_server.load("enemy/snake.png"),
-                sprite: Sprite {
-                    flip_x: x_flip,
+            entity_bundle: EntitySpriteBundle {
+                sprite_bundle: SpriteBundle {
+                    texture: asset_server.load("enemy/snake.png"),
+                    sprite: Sprite {
+                        flip_x: x_flip,
+                        ..Default::default()
+                    },
                     ..Default::default()
                 },
-                ..Default::default()
+                collider,
+                rigid_body: RigidBody::Dynamic,
+                coll_groups: CollGroupsConfig::enemy(),
+                gravity: GravityScale(0.0),
+                locked_axes: LockedAxes::ROTATION_LOCKED,
             },
             enemy,
-            collider,
-            rigid_body: RigidBody::Dynamic,
-            coll_groups: CollGroupsConfig::enemy(),
-            gravity: GravityScale(0.0),
-            locked_axes: LockedAxes::ROTATION_LOCKED,
         }
     }
 }
