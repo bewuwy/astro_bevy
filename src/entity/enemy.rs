@@ -1,5 +1,6 @@
 use std::time::Duration;
 
+use bevy::math::vec2;
 use bevy::prelude::*;
 use bevy_ecs_ldtk::prelude::*;
 use bevy_rapier2d::prelude::*;
@@ -55,6 +56,11 @@ fn enemy_system(
     for (mut enemy, transform) in enemy_query.iter_mut() {
         enemy.last_shot.tick(time.delta());
 
+        let bullet_direction = match enemy.direction {
+            SpriteDirection::Right => vec2(1.0, 0.0),
+            _ => vec2(-1.0, 0.0),
+        };
+
         if enemy.last_shot.finished() {
             // spawn bullet
             Bullet::new(asset_server.load("bullet/enemy.png"))
@@ -62,7 +68,7 @@ fn enemy_system(
                 .spawn(
                     transform.translation.x,
                     transform.translation.y - 4.0,
-                    enemy.direction,
+                    bullet_direction,
                     &mut commands,
                 );
 

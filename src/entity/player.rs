@@ -16,8 +16,13 @@ fn player_system(
 
     mut commands: Commands,
     keyboard_input: Res<Input<KeyCode>>,
+    buttons: Res<Input<MouseButton>>,
+    windows: Res<Windows>,
     asset_server: Res<AssetServer>,
+    q_camera: Query<(&Camera, &GlobalTransform)>,
 ) {
+    let (camera, camera_transform) = q_camera.single();
+
     for (mut player, mut player_vel, mut player_sprite, mut player_transform) in
         player_query.iter_mut()
     {
@@ -33,12 +38,6 @@ fn player_system(
             println!("You ded.");
             player.dead = false;
         }
-
-        // // print player cords
-        // println!(
-        //     "Player cords: x: {}, y: {}",
-        //     player_transform.translation.x, player_transform.translation.y
-        // );
 
         // movement
         let up = keyboard_input.pressed(KeyCode::W) || keyboard_input.pressed(KeyCode::Up);
@@ -80,20 +79,41 @@ fn player_system(
         player_vel.linvel = move_delta * player.speed;
 
         // shooting
-        if keyboard_input.just_pressed(KeyCode::Space) {
-            let bullet_x = match player.direction {
-                SpriteDirection::Left => player_transform.translation.x - 8.0,
-                SpriteDirection::Right => player_transform.translation.x + 8.0,
-                SpriteDirection::Down => player_transform.translation.x - 7.0,
-                SpriteDirection::Up => player_transform.translation.x + 7.0,
-            };
+        let window = windows.get_primary().unwrap();
 
-            Bullet::new(asset_server.load("bullet/player.png")).spawn(
-                bullet_x,
-                player_transform.translation.y - 7.0,
-                player.direction,
-                &mut commands,
-            );
+        if buttons.just_pressed(MouseButton::Left) {
+            if let Some(mouse_pos) = window.cursor_position() {
+                // get mouse position in world space
+                // get the size of the window
+                let window_size = Vec2::new(window.width() as f32, window.height() as f32);
+
+                // convert screen position [0..resolution] to ndc [-1..1] (gpu coordinates)
+                let ndc = (mouse_pos / window_size) * 2.0 - Vec2::ONE;
+
+                // matrix for undoing the projection and camera transform
+                let ndc_to_world =
+                    camera_transform.compute_matrix() * camera.projection_matrix().inverse();
+
+                // use it to convert ndc to world-space coordinates
+                let world_pos = ndc_to_world.project_point3(ndc.extend(-1.0));
+
+                // reduce it to a 2D value
+                let world_pos: Vec2 = world_pos.truncate();
+
+                // calculate vector of length 1 to mouse position
+                let player_pos = Vec2::new(
+                    player_transform.translation.x,
+                    player_transform.translation.y,
+                );
+                let direction = (world_pos - player_pos).normalize();
+
+                Bullet::new(asset_server.load("bullet/player.png")).spawn(
+                    player_transform.translation.x,
+                    player_transform.translation.y - 7.0,
+                    direction,
+                    &mut commands,
+                );
+            }
         }
     }
 }

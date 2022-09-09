@@ -1,6 +1,4 @@
-use std::f32::consts::PI;
-
-use bevy::{math::vec2, prelude::*};
+use bevy::prelude::*;
 use bevy_rapier2d::prelude::*;
 
 use crate::config::*;
@@ -93,36 +91,26 @@ impl Bullet {
         self
     }
 
-    pub fn spawn(&self, x: f32, y: f32, direction: SpriteDirection, commands: &mut Commands) {
+    pub fn spawn(&self, x: f32, y: f32, direction: Vec2, commands: &mut Commands) {
         let coll_group = match self.type_ {
             BulletType::Player => CollGroupsConfig::bullet_player(),
             BulletType::Enemy => CollGroupsConfig::bullet_enemy(),
         };
 
-        let bullet_vel = match direction {
-            SpriteDirection::Left => vec2(-self.speed, 0.0),
-            SpriteDirection::Right => vec2(self.speed, 0.0),
-            SpriteDirection::Up => vec2(0.0, self.speed),
-            SpriteDirection::Down => vec2(0.0, -self.speed),
-        };
-
-        let bullet_rotation = match direction {
-            SpriteDirection::Left => 0.0,
-            SpriteDirection::Right => PI,
-            SpriteDirection::Up => PI / 2.0,
-            SpriteDirection::Down => 1.5 * PI,
-        };
+        let velocity = direction * self.speed;
+        // get rotation from vector
+        let rotation = velocity.y.atan2(velocity.x);
 
         commands
             .spawn()
             .insert(RigidBody::Dynamic)
             .insert(Collider::cuboid(7.5, 2.0))
-            .insert(Velocity::linear(bullet_vel))
+            .insert(Velocity::linear(velocity))
             .insert(GravityScale(0.0))
             .insert_bundle(SpriteBundle {
                 texture: self.texture.clone(),
                 transform: Transform::from_xyz(x, y, Z_INDEX_BULLET)
-                    .with_rotation(Quat::from_rotation_z(bullet_rotation)),
+                    .with_rotation(Quat::from_rotation_z(rotation)),
 
                 ..Default::default()
             })

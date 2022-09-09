@@ -60,7 +60,9 @@ fn main() {
         .run();
 }
 
-fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
+fn setup(mut commands: Commands, asset_server: Res<AssetServer>, mut windows: ResMut<Windows>) {
+    let window = windows.get_primary_mut().unwrap();
+
     // Add a 2D Camera
     commands.spawn_bundle(Camera2dBundle {
         projection: OrthographicProjection {
@@ -70,6 +72,12 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
         transform: Transform::from_xyz(WINDOW_WIDTH / 2.0, WINDOW_HEIGHT / 2.0, 1000.0),
         ..Default::default()
     });
+
+    // // setup cursor
+    // window.set_cursor_visibility(false);
+
+    // change cursor to crosshair
+    window.set_cursor_icon(bevy::window::CursorIcon::Crosshair);
 
     // Spawn from LDtk
     commands.spawn_bundle(LdtkWorldBundle {
