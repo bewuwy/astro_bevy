@@ -4,6 +4,8 @@ use bevy::prelude::*;
 use bevy_ecs_ldtk::prelude::*;
 use bevy_rapier2d::prelude::*;
 
+use crate::config::CollGroupsConfig;
+
 pub fn spawn_wall_colliders(
     mut commands: Commands,
     wall_query: Query<(&GridCoords, &Parent), Added<Wall>>,
@@ -139,6 +141,7 @@ pub fn spawn_wall_colliders(
                                     * grid_size as f32
                                     / 2.,
                             ))
+                            .insert(CollGroupsConfig::wall())
                             .insert(RigidBody::Fixed)
                             // .insert(PhysicMaterial {
                             //     friction: 0.1,

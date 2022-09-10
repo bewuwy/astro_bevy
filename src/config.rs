@@ -42,10 +42,10 @@ impl CollGroupsConfig {
         CollisionGroups::new(0b01000, 0b10011)
     }
 
-    // pub fn wall() -> CollisionGroups {
-    //     // Group 4, interacts with group 0, 1, 2, 3
-    //     CollisionGroups::new(0b10000, 0b01111)
-    // }
+    pub fn wall() -> CollisionGroups {
+        // Group 4, interacts with group 0, 1, 2, 3
+        CollisionGroups::new(0b10000, 0b01111)
+    }
 }
 
 // utility

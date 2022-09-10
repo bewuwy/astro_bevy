@@ -80,7 +80,7 @@ pub struct Bullet {
 impl Bullet {
     pub fn new(texture: Handle<Image>) -> Self {
         Self {
-            speed: 1300.0,
+            speed: 500.0,
             texture,
             type_: BulletType::Player,
         }

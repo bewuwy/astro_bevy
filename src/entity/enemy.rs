@@ -5,8 +5,8 @@ use bevy::prelude::*;
 use bevy_ecs_ldtk::prelude::*;
 use bevy_rapier2d::prelude::*;
 
-use crate::bullet::{Bullet, BulletType};
 use crate::config::*;
+use crate::entity::bullet::{Bullet, BulletType};
 
 use super::EntitySpriteBundle;
 

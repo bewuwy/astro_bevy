@@ -1,6 +1,7 @@
 use bevy::prelude::*;
 use bevy_rapier2d::prelude::*;
 
+pub mod bullet;
 pub mod enemy;
 pub mod player;
 

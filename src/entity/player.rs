@@ -1,15 +1,18 @@
+use bevy::math::vec2;
 use bevy::prelude::*;
 use bevy_ecs_ldtk::prelude::*;
 use bevy_rapier2d::prelude::*;
 
-use crate::bullet::*;
 use crate::config::*;
+use crate::entity::bullet::*;
 use crate::entity::*;
 
 fn player_system(
     mut player_query: Query<(
         &mut Player,
         &mut Velocity,
+        &mut ExternalImpulse,
+        &mut CollisionGroups,
         &mut TextureAtlasSprite,
         &mut Transform,
     )>,
@@ -20,14 +23,21 @@ fn player_system(
     windows: Res<Windows>,
     asset_server: Res<AssetServer>,
     q_camera: Query<(&Camera, &GlobalTransform)>,
+    time: Res<Time>,
 ) {
     let (camera, camera_transform) = q_camera.single();
 
-    for (mut player, mut player_vel, mut player_sprite, mut player_transform) in
-        player_query.iter_mut()
+    for (
+        mut player,
+        mut player_vel,
+        mut player_impulse,
+        mut player_coll_groups,
+        mut player_sprite,
+        mut player_transform,
+    ) in player_query.iter_mut()
     {
         // check if player dead
-        if player.dead {
+        if player.dead && !player.immortal {
             // teleport player
             player_transform.translation.x = player.start_coords.x;
             player_transform.translation.y = player.start_coords.y;
@@ -61,6 +71,35 @@ fn player_system(
             };
         }
 
+        // dash
+        const PLAYER_DASH_SPEED: f32 = 15.0;
+        player.dash_timer.tick(time.delta());
+        player.dash_cooldown.tick(time.delta());
+
+        if player.dash_cooldown.finished() && !player.dashing && keyboard_input.just_pressed(KeyCode::Space) {
+            player.dashing = true;
+            player.dash_timer.reset();
+        }
+
+        if player.dashing && !player.dash_timer.finished() {
+            let direction = match player.direction {
+                SpriteDirection::Up => vec2(0.0, 1.0),
+                SpriteDirection::Down => vec2(0.0, -1.0),
+                SpriteDirection::Left => vec2(-1.0, 0.0),
+                SpriteDirection::Right => vec2(1.0, 0.0),
+            };
+
+            player_impulse.impulse = direction * PLAYER_DASH_SPEED;
+
+            player_coll_groups.filters = 0b10000;
+        }
+        if player.dash_timer.just_finished() {
+            player.dashing = false;
+            player_coll_groups.filters = CollGroupsConfig::player().filters;
+
+            player.dash_cooldown.reset();
+        }
+
         // update sprite
         match player.direction {
             SpriteDirection::Right => player_sprite.index = 0,
@@ -69,13 +108,12 @@ fn player_system(
             SpriteDirection::Down => player_sprite.index = 3,
         }
 
+        // Update the velocity on the rigid_body_component,
+        // the bevy_rapier plugin will update the Sprite transform.
         let mut move_delta = Vec2::new(x_axis as f32, y_axis as f32);
         if move_delta != Vec2::ZERO {
             move_delta /= move_delta.length();
         }
-
-        // Update the velocity on the rigid_body_component,
-        // the bevy_rapier plugin will update the Sprite transform.
         player_vel.linvel = move_delta * player.speed;
 
         // shooting
@@ -118,12 +156,16 @@ fn player_system(
     }
 }
 
-#[derive(Component, Clone, Copy, Debug)]
+#[derive(Component, Clone, Debug)]
 pub struct Player {
     start_coords: Vec2,
     pub dead: bool,
+    dashing: bool,
+    dash_timer: Timer,
+    dash_cooldown: Timer,
     speed: f32,
     direction: SpriteDirection,
+    immortal: bool,
 }
 
 impl Player {
@@ -131,8 +173,12 @@ impl Player {
         Self {
             start_coords: Vec2::new(x, y),
             dead: false,
+            dashing: false,
+            dash_timer: Timer::from_seconds(0.3, false),
+            dash_cooldown: Timer::from_seconds(0.3, false),
             speed: 300.0,
             direction: SpriteDirection::Left,
+            immortal: true,
         }
     }
 }
@@ -149,6 +195,8 @@ pub struct PlayerBundle {
     worldly: Worldly,
     #[bundle]
     entity_bundle: EntityBundle,
+    external_impulse: ExternalImpulse,
+    ccd: Ccd,
 }
 
 impl LdtkEntity for PlayerBundle {
@@ -179,14 +227,17 @@ impl LdtkEntity for PlayerBundle {
                 },
                 rigid_body: RigidBody::Dynamic,
                 velocity: Velocity::zero(),
-                collider: Collider::compound(vec![
-                    (Vec2::new(0.0, 0.0), 0.0, Collider::ball(10.0)),
-                    (Vec2::new(0.0, -10.0), 0.0, Collider::cuboid(5.0, 5.0)),
-                ]),
+                collider: Collider::compound(vec![(
+                    Vec2::new(0.0, -2.0),
+                    0.0,
+                    Collider::cuboid(7.0, 14.0),
+                )]),
                 gravity: GravityScale(0.0),
                 locked_axes: LockedAxes::ROTATION_LOCKED,
                 coll_groups: CollGroupsConfig::player(),
             },
+            external_impulse: ExternalImpulse::default(),
+            ccd: Ccd { enabled: true },
         }
     }
 }

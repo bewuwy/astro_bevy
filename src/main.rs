@@ -2,15 +2,14 @@ use bevy::{prelude::*, render::camera::ScalingMode};
 use bevy_ecs_ldtk::prelude::*;
 use bevy_rapier2d::prelude::*;
 
-mod bullet;
 mod camera;
 mod config;
 mod entity;
 mod level_manager;
 mod wall;
 
-use bullet::BulletPlugin;
 use config::*;
+use entity::bullet::BulletPlugin;
 use entity::enemy::*;
 use entity::player::*;
 use level_manager::spawn_levels;
