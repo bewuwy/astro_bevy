@@ -7,6 +7,7 @@ mod config;
 mod entity;
 mod level_manager;
 mod wall;
+mod bg;
 
 use config::*;
 use entity::bullet::BulletPlugin;
@@ -18,6 +19,7 @@ use wall::*;
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
+        // ldtk
         .add_plugin(LDtkSetup)
         // window setup
         .insert_resource(WindowDescriptor {
@@ -30,15 +32,10 @@ fn main() {
         })
         // pixel art camera setup
         .insert_resource(bevy::render::texture::ImageSettings::default_nearest())
-        // background colour
-        .insert_resource(ClearColor(Color::rgb(
-            BACKGROUND_COLOR[0] / 255.0,
-            BACKGROUND_COLOR[1] / 255.0,
-            BACKGROUND_COLOR[2] / 255.0,
-        )))
         // rapier
         .add_plugin(RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(100.0))
         // plugins
+        .add_plugin(bg::BgPlugin)
         .add_plugin(SetupPlugin)
         .add_plugin(PlayerPlugin)
         .add_plugin(BulletPlugin)
@@ -91,7 +88,8 @@ impl Plugin for LDtkSetup {
                 level_spawn_behavior: LevelSpawnBehavior::UseWorldTranslation {
                     load_level_neighbors: false,
                 },
-                set_clear_color: SetClearColor::FromLevelBackground,
+                set_clear_color: SetClearColor::FromEditorBackground,
+                level_background: LevelBackground::Rendered,
                 ..Default::default()
             })
             .register_ldtk_int_cell::<WallBundle>(1)

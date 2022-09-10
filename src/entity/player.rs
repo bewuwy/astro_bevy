@@ -36,6 +36,12 @@ fn player_system(
         mut player_transform,
     ) in player_query.iter_mut()
     {
+
+        // update player z index in a stupid way, because ldtk doesn't support z index (i think)
+        if player_transform.translation.z != 10.0 {
+            player_transform.translation.z = 10.0;
+        }
+
         // check if player dead
         if player.dead && !player.immortal {
             // teleport player
@@ -178,7 +184,7 @@ impl Player {
             dash_cooldown: Timer::from_seconds(0.3, false),
             speed: 300.0,
             direction: SpriteDirection::Left,
-            immortal: true,
+            immortal: false,
         }
     }
 }
@@ -222,7 +228,7 @@ impl LdtkEntity for PlayerBundle {
                         4,
                         1,
                     )),
-                    transform: Transform::from_xyz(x, y, Z_INDEX_PLAYER),
+                    transform: Transform::from_xyz(x, y, 100.0),
                     ..Default::default()
                 },
                 rigid_body: RigidBody::Dynamic,
