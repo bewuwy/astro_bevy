@@ -20,34 +20,13 @@ impl Enemy {
     pub fn new() -> Self {
         Enemy {
             direction: SpriteDirection::Right,
-            last_shot: Timer::from_seconds(2.0, true),
+            last_shot: Timer::from_seconds(1.0, true),
         }
     }
-
-    // pub fn spawn(&self, x: f32, y: f32, texture: Handle<Image>, commands: &mut Commands) {
-    //     commands
-    //         .spawn()
-    //         .insert(RigidBody::Dynamic)
-    //         .insert(Collider::compound(vec![(
-    //             Vec2::new(0.0, -5.0),
-    //             0.0,
-    //             Collider::cuboid(16.0, 26.0),
-    //         )]))
-    //         .insert(Velocity::zero())
-    //         .insert(GravityScale(0.0))
-    //         .insert(LockedAxes::ROTATION_LOCKED)
-    //         .insert_bundle(SpriteBundle {
-    //             texture,
-    //             transform: Transform::from_xyz(x, y, Z_INDEX_ENEMY),
-    //             ..Default::default()
-    //         })
-    //         .insert(CollGroupsConfig::enemy())
-    //         .insert(self.clone());
-    // }
 }
 
 fn enemy_system(
-    mut enemy_query: Query<(&mut Enemy, &Transform)>,
+    mut enemy_query: Query<(&mut Enemy, &GlobalTransform)>,
 
     mut commands: Commands,
     asset_server: Res<AssetServer>,
@@ -66,8 +45,8 @@ fn enemy_system(
             Bullet::new(asset_server.load("bullet/enemy.png"))
                 .with_type(BulletType::Enemy)
                 .spawn(
-                    transform.translation.x,
-                    transform.translation.y - 4.0,
+                    transform.translation().x,
+                    transform.translation().y - 4.0,
                     bullet_direction,
                     &mut commands,
                 );

@@ -16,7 +16,7 @@
 	"worldGridWidth": 256,
 	"worldGridHeight": 256,
 	"defaultLevelWidth": 512,
-	"defaultLevelHeight": 640,
+	"defaultLevelHeight": 768,
 	"defaultPivotX": 0,
 	"defaultPivotY": 0,
 	"defaultGridSize": 16,
@@ -227,7 +227,7 @@
 			"tileRect": { "tilesetUid": 16, "x": 32, "y": 0, "w": 32, "h": 32 },
 			"nineSliceBorders": [],
 			"maxCount": 1,
-			"limitScope": "PerLevel",
+			"limitScope": "PerWorld",
 			"limitBehavior": "MoveLastOne",
 			"pivotX": 0,
 			"pivotY": 0,
@@ -325,7 +325,7 @@
 			"iid": "28c31d50-2a00-11ed-9c42-3190aff26295",
 			"uid": 0,
 			"worldX": 0,
-			"worldY": -512,
+			"worldY": 0,
 			"worldDepth": 0,
 			"pxWid": 640,
 			"pxHei": 512,
@@ -644,7 +644,7 @@
 			"iid": "d10a4e50-2a00-11ed-8634-bb1f07d1b82b",
 			"uid": 14,
 			"worldX": 640,
-			"worldY": -512,
+			"worldY": 0,
 			"worldDepth": 0,
 			"pxWid": 640,
 			"pxHei": 512,
@@ -967,20 +967,6 @@
 								"id": "V_String",
 								"params": ["Up"]
 							}] }]
-						},
-						{
-							"__identifier": "Player",
-							"__grid": [30,16],
-							"__pivot": [0,0],
-							"__tags": [],
-							"__tile": { "tilesetUid": 16, "x": 32, "y": 0, "w": 32, "h": 32 },
-							"__smartColor": "#94D9B3",
-							"iid": "0a0d8f50-2a00-11ed-93a7-61fce5971705",
-							"width": 32,
-							"height": 32,
-							"defUid": 15,
-							"px": [480,256],
-							"fieldInstances": []
 						}
 					]
 				}

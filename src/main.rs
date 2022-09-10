@@ -6,29 +6,20 @@ mod bullet;
 mod camera;
 mod config;
 mod entity;
+mod level_manager;
 mod wall;
 
 use bullet::BulletPlugin;
 use config::*;
 use entity::enemy::*;
 use entity::player::*;
+use level_manager::spawn_levels;
 use wall::*;
 
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
-        // ldtk
-        .add_plugin(LdtkPlugin)
-        .insert_resource(LevelSelection::Index(0))
-        .insert_resource(LdtkSettings {
-            level_spawn_behavior: LevelSpawnBehavior::UseZeroTranslation,
-            set_clear_color: SetClearColor::FromLevelBackground,
-            ..Default::default()
-        })
-        .register_ldtk_int_cell::<WallBundle>(1)
-        .register_ldtk_entity::<EnemyBundle>("Snake_Enemy")
-        .register_ldtk_entity::<PlayerBundle>("Player")
-        .add_system(spawn_wall_colliders)
+        .add_plugin(LDtkSetup)
         // window setup
         .insert_resource(WindowDescriptor {
             title: GAME_NAME.to_string(),
@@ -88,5 +79,27 @@ impl Plugin for SetupPlugin {
 
         #[cfg(feature = "debug")] // rapier debug
         app.add_plugin(RapierDebugRenderPlugin::default());
+    }
+}
+
+pub struct LDtkSetup;
+
+impl Plugin for LDtkSetup {
+    fn build(&self, app: &mut App) {
+        // ldtk
+        app.add_plugin(LdtkPlugin)
+            .insert_resource(LdtkSettings {
+                level_spawn_behavior: LevelSpawnBehavior::UseWorldTranslation {
+                    load_level_neighbors: false,
+                },
+                set_clear_color: SetClearColor::FromLevelBackground,
+                ..Default::default()
+            })
+            .register_ldtk_int_cell::<WallBundle>(1)
+            .register_ldtk_entity::<EnemyBundle>("Snake_Enemy")
+            .register_ldtk_entity::<PlayerBundle>("Player")
+            // ldtk systems
+            .add_system(spawn_wall_colliders)
+            .add_startup_system(spawn_levels);
     }
 }

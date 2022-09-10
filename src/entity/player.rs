@@ -131,15 +131,22 @@ impl Player {
         Self {
             start_coords: Vec2::new(x, y),
             dead: false,
-            speed: 400.0,
+            speed: 300.0,
             direction: SpriteDirection::Left,
         }
     }
 }
 
-#[derive(Clone, Bundle)]
+impl Default for Player {
+    fn default() -> Self {
+        Self::new(0.0, 0.0)
+    }
+}
+
+#[derive(Clone, Bundle, Default)]
 pub struct PlayerBundle {
     player: Player,
+    worldly: Worldly,
     #[bundle]
     entity_bundle: EntityBundle,
 }
@@ -153,12 +160,12 @@ impl LdtkEntity for PlayerBundle {
         asset_server: &AssetServer,
         textures: &mut Assets<TextureAtlas>,
     ) -> PlayerBundle {
-        // print coordinates
         let x = entity.px.x as f32;
         let y = WINDOW_HEIGHT - entity.px.y as f32;
 
         PlayerBundle {
             player: Player::new(x, y),
+            worldly: Worldly::from_entity_info(entity),
             entity_bundle: EntityBundle {
                 sprite_bundle: SpriteSheetBundle {
                     texture_atlas: textures.add(TextureAtlas::from_grid(
