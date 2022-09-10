@@ -1,11 +1,6 @@
 use bevy::prelude::*;
 
-
-fn bg_setup (
-    mut commands: Commands,
-    asset_server: Res<AssetServer>,
-) {
-
+fn bg_setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     commands.spawn_bundle(SpriteBundle {
         texture: asset_server.load("bg.png"),
         transform: Transform::from_scale(Vec3::new(1., 1., 0.0)),

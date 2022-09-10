@@ -2,12 +2,12 @@ use bevy::{prelude::*, render::camera::ScalingMode};
 use bevy_ecs_ldtk::prelude::*;
 use bevy_rapier2d::prelude::*;
 
+mod bg;
 mod camera;
 mod config;
 mod entity;
 mod level_manager;
 mod wall;
-mod bg;
 
 use config::*;
 use entity::bullet::BulletPlugin;

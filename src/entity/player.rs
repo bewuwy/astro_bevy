@@ -7,6 +7,7 @@ use crate::config::*;
 use crate::entity::bullet::*;
 use crate::entity::*;
 
+#[allow(clippy::type_complexity)]
 fn player_system(
     mut player_query: Query<(
         &mut Player,
@@ -16,14 +17,16 @@ fn player_system(
         &mut TextureAtlasSprite,
         &mut Transform,
     )>,
+    q_camera: Query<(&Camera, &GlobalTransform)>,
+    (keyboard_input, buttons, windows, asset_server, time): (
+        Res<Input<KeyCode>>,
+        Res<Input<MouseButton>>,
+        Res<Windows>,
+        Res<AssetServer>,
+        Res<Time>,
+    ),
 
     mut commands: Commands,
-    keyboard_input: Res<Input<KeyCode>>,
-    buttons: Res<Input<MouseButton>>,
-    windows: Res<Windows>,
-    asset_server: Res<AssetServer>,
-    q_camera: Query<(&Camera, &GlobalTransform)>,
-    time: Res<Time>,
 ) {
     let (camera, camera_transform) = q_camera.single();
 
@@ -36,7 +39,6 @@ fn player_system(
         mut player_transform,
     ) in player_query.iter_mut()
     {
-
         // update player z index in a stupid way, because ldtk doesn't support z index (i think)
         if player_transform.translation.z != 10.0 {
             player_transform.translation.z = 10.0;
@@ -82,7 +84,10 @@ fn player_system(
         player.dash_timer.tick(time.delta());
         player.dash_cooldown.tick(time.delta());
 
-        if player.dash_cooldown.finished() && !player.dashing && keyboard_input.just_pressed(KeyCode::Space) {
+        if player.dash_cooldown.finished()
+            && !player.dashing
+            && keyboard_input.just_pressed(KeyCode::Space)
+        {
             player.dashing = true;
             player.dash_timer.reset();
         }
