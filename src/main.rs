@@ -48,11 +48,8 @@ fn main() {
         )))
         // rapier
         .add_plugin(RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(100.0))
-        // debug
-        .add_plugin(RapierDebugRenderPlugin::default())
-        // systems
-        .add_startup_system(setup)
         // plugins
+        .add_plugin(SetupPlugin)
         .add_plugin(PlayerPlugin)
         .add_plugin(BulletPlugin)
         .add_plugin(EnemyPlugin)
@@ -73,9 +70,6 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>, mut windows: Re
         ..Default::default()
     });
 
-    // // setup cursor
-    // window.set_cursor_visibility(false);
-
     // change cursor to crosshair
     window.set_cursor_icon(bevy::window::CursorIcon::Crosshair);
 
@@ -84,4 +78,15 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>, mut windows: Re
         ldtk_handle: asset_server.load("world.ldtk"),
         ..Default::default()
     });
+}
+
+pub struct SetupPlugin;
+
+impl Plugin for SetupPlugin {
+    fn build(&self, app: &mut App) {
+        app.add_startup_system(setup);
+
+        #[cfg(feature = "debug")] // rapier debug
+        app.add_plugin(RapierDebugRenderPlugin::default());
+    }
 }
