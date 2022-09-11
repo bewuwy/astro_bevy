@@ -1,3 +1,5 @@
+pub mod gun;
+
 use bevy::math::vec2;
 use bevy::prelude::*;
 use bevy_ecs_ldtk::prelude::*;
@@ -6,6 +8,8 @@ use bevy_rapier2d::prelude::*;
 use crate::config::*;
 use crate::entity::bullet::*;
 use crate::entity::*;
+
+use self::gun::{gun_system, Gun};
 
 #[allow(clippy::type_complexity)]
 fn player_system(
@@ -18,6 +22,8 @@ fn player_system(
         &mut Transform,
     )>,
     q_camera: Query<(&Camera, &GlobalTransform)>,
+    gun_query: Query<(&Gun, &Transform), Without<Player>>,
+
     (keyboard_input, buttons, windows, asset_server, time): (
         Res<Input<KeyCode>>,
         Res<Input<MouseButton>>,
@@ -131,38 +137,31 @@ fn player_system(
         let window = windows.get_primary().unwrap();
 
         if buttons.just_pressed(MouseButton::Left) {
-            if let Some(mouse_pos) = window.cursor_position() {
-                // get mouse position in world space
-                // get the size of the window
-                let window_size = Vec2::new(window.width() as f32, window.height() as f32);
+            let mouse_pos =
+                crate::input_manager::get_mouse_world_pos(window, camera, camera_transform);
 
-                // convert screen position [0..resolution] to ndc [-1..1] (gpu coordinates)
-                let ndc = (mouse_pos / window_size) * 2.0 - Vec2::ONE;
+            // calculate vector of length 1 to mouse position
+            let player_pos = Vec2::new(
+                player_transform.translation.x,
+                player_transform.translation.y,
+            );
+            let direction = (mouse_pos - player_pos).normalize();
 
-                // matrix for undoing the projection and camera transform
-                let ndc_to_world =
-                    camera_transform.compute_matrix() * camera.projection_matrix().inverse();
+            // get gun transform
+            let (gun, gun_transform) = gun_query.single();
 
-                // use it to convert ndc to world-space coordinates
-                let world_pos = ndc_to_world.project_point3(ndc.extend(-1.0));
+            let mut bullet_spawn =
+                Vec2::new(gun_transform.translation.x, gun_transform.translation.y);
+            // adjust bullet spawn position
+            bullet_spawn += direction * gun.bullet_offset.x;
+            bullet_spawn.y += gun.bullet_offset.y;
 
-                // reduce it to a 2D value
-                let world_pos: Vec2 = world_pos.truncate();
-
-                // calculate vector of length 1 to mouse position
-                let player_pos = Vec2::new(
-                    player_transform.translation.x,
-                    player_transform.translation.y,
-                );
-                let direction = (world_pos - player_pos).normalize();
-
-                Bullet::new(asset_server.load("bullet/player.png")).spawn(
-                    player_transform.translation.x,
-                    player_transform.translation.y - 7.0,
-                    direction,
-                    &mut commands,
-                );
-            }
+            Bullet::new(asset_server.load("bullet/player.png")).spawn(
+                bullet_spawn.x,
+                bullet_spawn.y,
+                direction,
+                &mut commands,
+            );
         }
     }
 }
@@ -210,6 +209,7 @@ pub struct PlayerBundle {
     ccd: Ccd,
 }
 
+// spawning player from LDtk
 impl LdtkEntity for PlayerBundle {
     fn bundle_entity(
         entity: &EntityInstance,
@@ -222,6 +222,7 @@ impl LdtkEntity for PlayerBundle {
         let x = entity.px.x as f32;
         let y = WINDOW_HEIGHT - entity.px.y as f32;
 
+        // spawn player - return bundle
         PlayerBundle {
             player: Player::new(x, y),
             worldly: Worldly::from_entity_info(entity),
@@ -257,6 +258,6 @@ pub struct PlayerPlugin;
 
 impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut App) {
-        app.add_system(player_system);
+        app.add_system(player_system).add_system(gun_system);
     }
 }

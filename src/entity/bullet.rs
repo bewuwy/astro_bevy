@@ -3,7 +3,7 @@ use bevy_rapier2d::prelude::*;
 
 use crate::config::*;
 use crate::entity::enemy::Enemy;
-use crate::entity::player::Player;
+use crate::player::Player;
 
 fn bullet_system(
     mut commands: Commands,

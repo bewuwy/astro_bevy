@@ -3,7 +3,6 @@ use bevy_rapier2d::prelude::*;
 
 pub mod bullet;
 pub mod enemy;
-pub mod player;
 
 #[derive(Clone, Default, Bundle)]
 pub struct EntityBundle {

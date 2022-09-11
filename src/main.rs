@@ -6,14 +6,16 @@ mod bg;
 mod camera;
 mod config;
 mod entity;
+mod input_manager;
 mod level_manager;
+mod player;
 mod wall;
 
 use config::*;
 use entity::bullet::BulletPlugin;
 use entity::enemy::*;
-use entity::player::*;
 use level_manager::spawn_levels;
+use player::*;
 use wall::*;
 
 fn main() {
